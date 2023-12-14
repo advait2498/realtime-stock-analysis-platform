@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  MyKinesisDataStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: MyDataIngestionStream
+      ShardCount: 4
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: my-lambda-bucket
+        S3Key: lambda-code.zip
+      Handler: main.handler
+      Role: arn:aws:iam::{AWSAccountID}:role/lambda-execution-role
+      Runtime: python3.9
+      Events:
+        MyKinesisEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAttr MyKinesisDataStream.Arn
+  MyQuickSightAnalysis:
+    Type: AWS::QuickSight::Analysis
+    Properties:
+      Name: MyQuickSightAnalysis
+  
